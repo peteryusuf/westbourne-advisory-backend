@@ -1,0 +1,57 @@
+version: '3'
+services:
+  strapi:
+    container_name: westbourne-advisory-strapi
+    build: .
+    image: westbourne-advisory-strapi:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: strapiDB
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+      JWT_SECRET: your-jwt-secret
+      ADMIN_JWT_SECRET: your-admin-jwt-secret
+      API_TOKEN_SALT: your-api-token-salt
+      TRANSFER_TOKEN_SALT: your-transfer-token-salt
+      APP_KEYS: your-app-keys
+    volumes:
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
+      - ./package.json:/opt/package.json
+      - ./yarn.lock:/opt/yarn.lock
+      - ./.env:/opt/app/.env
+      - ./public/uploads:/opt/app/public/uploads
+    ports:
+      - "1337:1337"
+    networks:
+      - strapi
+    depends_on:
+      - strapiDB
+    stdin_open: true
+    tty: true
+
+  strapiDB:
+    container_name: westbourne-advisory-strapi-db
+    restart: unless-stopped
+    image: postgres:14
+    environment:
+      POSTGRES_DB: strapi
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi
+    volumes:
+      - strapi-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - strapi
+
+volumes:
+  strapi-data:
+
+networks:
+  strapi:
+    name: Strapi
+    driver: bridge 
