@@ -12,6 +12,9 @@ RUN npm install --production
 # Copy source code
 COPY . .
 
+# Create necessary directories
+RUN mkdir -p public/uploads && chmod 755 public/uploads
+
 # Build application
 RUN npm run build
 
